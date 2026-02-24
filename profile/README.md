@@ -5,7 +5,7 @@ Open-source tools and drivers for Robotiq products.
 | Repository | Description |
 |---|---|
 | [tactile_sensors](https://github.com/Robotiq/tactile_sensors) | SDK, sensor I/O, and quickstart tools for the TSF-85 tactile sensor |
-| [ROS_Packages](https://github.com/Robotiq/ROS_Packages) | Robotiq ROS packages (grippers, tactile sensor) |
+| [ros](https://github.com/Robotiq/ROS_Packages) | Robotiq ROS packages (grippers, tactile sensor) |
 
 ## Community & Third-Party
 
