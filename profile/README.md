@@ -14,6 +14,7 @@ A curated list of community-maintained drivers and useful third-party projects r
 | Repository | Description |
 |---|---|
 | [pyRobotiqGripper](https://github.com/castetsb/pyRobotiqGripper) | Python library for controlling Robotiq grippers (2F-85, 2F-140, Hand-E) via Modbus RTU |
+| [ur_rtde](https://sdurobotics.gitlab.io/ur_rtde) | Provides some useful [instructions](https://sdurobotics.gitlab.io/ur_rtde/guides/guides.html#use-with-robotiq-gripper) on how to control a Robotiq gripper directly using a raw TCP socket |
 | [pyFT300](https://github.com/castetsb/pyFT300) | Python library for reading data from the Robotiq FT-300 force-torque sensor |
 | [pybullet_ur5_robotiq](https://github.com/ElectronicElephant/pybullet_ur5_robotiq) | UR5 + Robotiq 85/140 gripper simulation in PyBullet |
 | [GraspGen](https://github.com/NVlabs/GraspGen) | GraspGen: a diffusion-based framework for 6-DOF grasping |
