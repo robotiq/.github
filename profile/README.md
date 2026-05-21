@@ -13,6 +13,7 @@ A curated list of community-maintained drivers and useful third-party projects r
 
 | Repository | Description |
 |---|---|
+| [TSF-85 Isaac Sim Extension](https://github.com/Lab-CORO/TSF-85) | An Isaac Sim extension generating synthetic tactile maps for the TSF-85 |
 | [pyRobotiqGripper](https://github.com/castetsb/pyRobotiqGripper) | Python library for controlling Robotiq grippers (2F-85, 2F-140, Hand-E) via Modbus RTU |
 | [ur_rtde](https://sdurobotics.gitlab.io/ur_rtde) | Provides some useful [instructions](https://sdurobotics.gitlab.io/ur_rtde/guides/guides.html#use-with-robotiq-gripper) on how to control a Robotiq gripper directly using a raw TCP socket |
 | [pyFT300](https://github.com/castetsb/pyFT300) | Python library for reading data from the Robotiq FT-300 force-torque sensor |
