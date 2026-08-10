@@ -4,6 +4,7 @@ Open-source tools and drivers for Robotiq products.
 
 | Repository | Description |
 |---|---|
+| [grippers](https://github.com/Robotiq/grippers) | Standalone C++ SDK for the 2F adaptive grippers (2F-85 / 2F-140 / Hand-E) over Modbus RTU |
 | [tactile_sensors](https://github.com/Robotiq/tactile_sensors) | SDK, sensor I/O, and quickstart tools for the TSF-85 tactile sensor |
 | [ros](https://github.com/Robotiq/ROS_Packages) | Robotiq ROS packages (grippers, tactile sensor) |
 
