@@ -9,11 +9,13 @@
 //
 // Run via `.github/workflows/update-readme.yml` on a daily schedule, or
 // locally with `node scripts/update-readme.mjs` (optionally set GITHUB_TOKEN
-// to avoid the unauthenticated API rate limit).
+// to avoid the unauthenticated API rate limit). Pure helpers are exported
+// for scripts/update-readme.test.mjs; fetchOrgRepos/fetchDocsIntro/main hit
+// the network and aren't unit-tested.
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const README_PATH = path.join(ROOT, 'profile', 'README.md');
@@ -49,7 +51,7 @@ async function githubApi(url) {
 }
 
 // Public, non-archived, non-fork repos in the org, paginated.
-async function fetchOrgRepos() {
+export async function fetchOrgRepos() {
   const repos = [];
   for (let page = 1; ; page += 1) {
     const batch = await githubApi(`https://api.github.com/orgs/${ORG}/repos?type=public&per_page=100&page=${page}`);
@@ -63,11 +65,11 @@ async function fetchOrgRepos() {
     .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
 }
 
-function escapeCell(text) {
+export function escapeCell(text) {
   return text.replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
 }
 
-function buildRepoTable(repos) {
+export function buildRepoTable(repos) {
   const header = '| Repository | Description |';
   const separator = '|---|---|';
   const rows = repos.map((r) => `| [${r.name}](${r.url}) | ${escapeCell(r.description) || '_No description yet._'} |`);
@@ -83,7 +85,7 @@ async function fetchDocsIntro() {
   return res.text();
 }
 
-function extractMarkerBlock(raw, key) {
+export function extractMarkerBlock(raw, key) {
   const re = new RegExp(
     `\\{/\\* AUTO-GENERATED-${key}-TABLE:START \\*/\\}\\n([\\s\\S]*?)\\n\\{/\\* AUTO-GENERATED-${key}-TABLE:END \\*/\\}`
   );
@@ -91,11 +93,14 @@ function extractMarkerBlock(raw, key) {
   return m ? m[1].trim() : null;
 }
 
-// docs/intro.mdx links to product pages with paths relative to docs/
-// (e.g. "drivers/Adaptive%20grippers") — make them absolute so they resolve
-// from the profile README, which isn't served from the docs site.
-function absolutizeDocLinks(markdown) {
-  return markdown.replace(/\]\(drivers\//g, `](${DOCS_SITE_URL}/docs/drivers/`);
+// docs/intro.mdx lives at the docs/ root, so any relative link in it (not
+// absolute http(s), not a same-page #anchor) resolves against that root —
+// "drivers/...", "img/...", "./drivers/...", "contribute/..." alike.
+// Rewriting all of them (rather than only the "drivers/" ones this table
+// happens to use today) means a new link shape upstream still resolves
+// correctly here instead of silently 404ing on the org landing page.
+export function absolutizeDocLinks(markdown) {
+  return markdown.replace(/\]\((?!https?:|#)([^)]+)\)/g, (_, href) => `](${DOCS_SITE_URL}/docs/${href.replace(/^\.?\//, '')})`);
 }
 
 // generate-tools-table.js (in robotiq.github.io) always writes every one of
@@ -105,7 +110,7 @@ function absolutizeDocLinks(markdown) {
 // the shape this script expects (docs site restructured, marker renamed,
 // truncated response, ...). Treat that as a hard failure rather than
 // silently publishing a README with a gutted software tools section.
-function buildSoftwareToolsSection(introRaw) {
+export function buildSoftwareToolsSection(introRaw) {
   const parts = [];
   for (const { key, heading } of SOFTWARE_SECTIONS) {
     const block = extractMarkerBlock(introRaw, key);
@@ -121,18 +126,31 @@ function buildSoftwareToolsSection(introRaw) {
   return parts.join('\n\n');
 }
 
-function writeBetweenMarkers(filePath, key, content) {
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Pure text transform (no I/O), so it can be composed left-to-right over an
+// in-memory string and unit-tested without touching the filesystem. Throws
+// if `key`'s markers aren't present in `text` — callers are expected to run
+// every replacement they need before writing anything back out, so one
+// missing marker fails before any bytes are written, rather than after some
+// sections are already on disk and others aren't.
+export function replaceBetweenMarkers(text, key, content) {
   const startMarker = `<!-- AUTO-GENERATED-${key}:START -->`;
   const endMarker = `<!-- AUTO-GENERATED-${key}:END -->`;
-  const markerRegex = new RegExp(
-    `${startMarker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s\\S]*?${endMarker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`
-  );
-  const raw = fs.readFileSync(filePath, 'utf8');
-  if (!markerRegex.test(raw)) {
-    throw new Error(`[update-readme] Markers not found in ${path.relative(ROOT, filePath)}: ${startMarker}`);
+  const markerRegex = new RegExp(`${escapeRegExp(startMarker)}[\\s\\S]*?${escapeRegExp(endMarker)}`);
+  if (!markerRegex.test(text)) {
+    throw new Error(`[update-readme] Markers not found in profile/README.md: ${startMarker}`);
   }
   const block = `${startMarker}\n${content}\n${endMarker}`;
-  fs.writeFileSync(filePath, raw.replace(markerRegex, block), 'utf8');
+  // A function replacer is used because `content` (live repo descriptions,
+  // docs-site table cells) is untrusted as a String.replace() replacement
+  // *string* — "$&", "$`", "$'", "$1" etc. in it would otherwise be
+  // interpreted as replacement patterns instead of inserted literally,
+  // silently corrupting the marker block. A function replacer gets no such
+  // special-pattern handling.
+  return text.replace(markerRegex, () => block);
 }
 
 async function main() {
@@ -149,20 +167,26 @@ async function main() {
     );
   }
 
-  // Build and validate both sections before writing anything, so a failure
-  // in either one (e.g. the marker check above) never leaves the README
-  // with only one section refreshed.
+  // Build and validate both sections, and check both marker pairs actually
+  // exist in the README, entirely in memory before writing anything — one
+  // read, one write, so a failure partway through (e.g. a damaged marker)
+  // never leaves the README with only one section refreshed.
   const repoTable = buildRepoTable(repos);
   const softwareToolsSection = buildSoftwareToolsSection(introRaw);
 
-  writeBetweenMarkers(README_PATH, 'REPOS-TABLE', repoTable);
-  console.log(`[update-readme] Wrote ${repos.length} repositories to profile/README.md`);
+  let readme = fs.readFileSync(README_PATH, 'utf8');
+  readme = replaceBetweenMarkers(readme, 'REPOS-TABLE', repoTable);
+  readme = replaceBetweenMarkers(readme, 'SOFTWARE-TOOLS', softwareToolsSection);
+  fs.writeFileSync(README_PATH, readme, 'utf8');
 
-  writeBetweenMarkers(README_PATH, 'SOFTWARE-TOOLS', softwareToolsSection);
-  console.log('[update-readme] Wrote software tools section to profile/README.md');
+  console.log(`[update-readme] Wrote ${repos.length} repositories and the software tools section to profile/README.md`);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+// Only run when executed directly (`node scripts/update-readme.mjs`), not
+// when imported by scripts/update-readme.test.mjs.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
