@@ -4,34 +4,25 @@ name: Update README
 # scripts/update-readme.mjs): the repository table (from the GitHub API) and
 # the software tools tables (imported from robotiq/robotiq.github.io's
 # docs/intro.mdx). Opens a PR only when the regenerated content actually
-# differs, then auto-merges it — mirroring
-# robotiq.github.io's .github/workflows/dependabot-auto-merge.yml.
+# differs, then merges it — fully automatic, no human review, no bot PAT.
 #
-# Why this needs a PAT instead of just GITHUB_TOKEN: the prToMain ruleset's
-# required-review rule blocks a PR's *author* from approving its own PR. In
-# dependabot-auto-merge.yml, Dependabot (a distinct actor) opens the PR and
-# GITHUB_TOKEN (github-actions[bot]) approves it — two different actors, so
-# it's not self-approval. Here there's no Dependabot; this workflow itself
-# generates the content. So the "open PR" step authenticates as
-# README_BOT_PAT (a fine-grained PAT scoped to just this repo, Contents +
-# Pull requests: write) instead of GITHUB_TOKEN, making its author a
-# distinct actor from the github-actions[bot] identity that then approves
-# and merges it in the next step.
+# How this merges without a second identity: `prToMain` has a bypass actor
+# for the "GitHub Actions" app (mode: pull request), exempting
+# github-actions[bot] — the identity GITHUB_TOKEN always acts as — from the
+# 1-review requirement. A bot still can't literally approve its own PR (a
+# GitHub-wide rule bypass doesn't touch), so this workflow doesn't try to;
+# it just merges directly, since the rule requiring an approval doesn't
+# apply to this actor in the first place.
 #
-# Why this is safe to merge without further human review: the generated
-# content is either the GitHub API's own repo descriptions or
-# robotiq.github.io's own published docs/intro.mdx — both already public and
-# already reviewed upstream. What actually gates the merge is the "Test"
-# workflow (.github/workflows/test.yml) as a required status check on the
-# prToMain ruleset: `gh pr merge --auto` waits on it, so a change that breaks
-# update-readme.mjs sits as an open, failing PR instead of reaching the org's
-# public landing page. Without that required check, `--auto` has nothing to
-# wait on and errors out instead of merging — see the review on PR #2.
-#
-# Also requires: `allow_auto_merge` enabled on this repo (Settings → General
-# → Pull Requests), and the commit's author email resolving to a real GitHub
-# account (below) so prToMain's require_extra_approval_for_unattributed_changes
-# rule doesn't kick in and demand a second approval nothing here can produce.
+# What still gates the merge: a *separate* ruleset, `requireTests`, targets
+# the same branch with only the "test" required status check and NO bypass
+# actors — it applies to every actor, bypass or not. Bypassing prToMain's
+# review rule doesn't touch it, because ruleset bypass is scoped to the
+# whole ruleset it's granted on, not to individual rules within it (that's
+# exactly why the check was moved into its own ruleset instead of living
+# alongside the bypassed review rule in prToMain — see the discussion on
+# PR #2). So a change that breaks update-readme.mjs still sits as an open,
+# failing PR instead of reaching the org's public landing page.
 
 on:
   schedule:
@@ -46,10 +37,7 @@ jobs:
   update-readme:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.README_BOT_PAT }}
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
@@ -60,27 +48,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/update-readme.mjs
 
-      - name: Open PR if content changed
-        id: pr
+      - name: Open and merge PR if content changed
         env:
-          GH_TOKEN: ${{ secrets.README_BOT_PAT }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if git diff --quiet -- profile/README.md; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           # Fixed name rather than one timestamped per run: a run that lands
           # before yesterday's PR merged (still waiting on the required
-          # check) force-pushes onto the same branch/PR instead of piling up
-          # a new branch and a new unmergeable PR each day.
+          # check) force-pushes onto the same branch/PR instead of piling
+          # up a new branch and a new unmergeable PR each day.
           BRANCH="auto/update-readme"
-          git config user.name "robotiq-readme-bot"
-          # This must resolve to a real GitHub account (github-actions[bot]'s
-          # own noreply address) or the prToMain ruleset's
-          # require_extra_approval_for_unattributed_changes rule treats the
-          # commit as unattributed and demands a second approval this
-          # workflow has no way to produce.
+          git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
           git add profile/README.md
@@ -98,14 +79,4 @@ jobs:
               --body "Automated daily refresh of the repository table (GitHub API) and software tools section (robotiq.github.io docs/intro.mdx) — see \`scripts/update-readme.mjs\`.")
           fi
 
-          echo "changed=true" >> "$GITHUB_OUTPUT"
-          echo "url=$PR_URL" >> "$GITHUB_OUTPUT"
-
-      - name: Approve and auto-merge
-        if: steps.pr.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_URL: ${{ steps.pr.outputs.url }}
-        run: |
-          gh pr review --approve "$PR_URL"
           gh pr merge --auto --squash --delete-branch "$PR_URL"
