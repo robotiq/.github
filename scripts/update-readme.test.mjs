@@ -54,6 +54,13 @@ test('absolutizeDocLinks rewrites relative links, leaves absolute/anchor links a
   assert.match(output, /\[e\]\(#section\)/);
 });
 
+test('absolutizeDocLinks prepends only the domain to a site-root-relative link, without doubling /docs/', () => {
+  const output = absolutizeDocLinks('[a](/docs/drivers/Foo) [b](/img/x.png)');
+  assert.match(output, /\[a\]\(https:\/\/robotiq\.github\.io\/docs\/drivers\/Foo\)/);
+  assert.doesNotMatch(output, /docs\/docs/);
+  assert.match(output, /\[b\]\(https:\/\/robotiq\.github\.io\/img\/x\.png\)/);
+});
+
 function fakeIntro(overrides = {}) {
   const sections = { SDK: '| sdk |', ROS2: '| ros2 |', ROS1: '| ros1 |', PHYSICS_ENGINE: '| phys |', OTHER: '| other |', ...overrides };
   return Object.entries(sections)

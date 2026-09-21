@@ -93,14 +93,20 @@ export function extractMarkerBlock(raw, key) {
   return m ? m[1].trim() : null;
 }
 
-// docs/intro.mdx lives at the docs/ root, so any relative link in it (not
-// absolute http(s), not a same-page #anchor) resolves against that root —
-// "drivers/...", "img/...", "./drivers/...", "contribute/..." alike.
-// Rewriting all of them (rather than only the "drivers/" ones this table
-// happens to use today) means a new link shape upstream still resolves
-// correctly here instead of silently 404ing on the org landing page.
+// docs/intro.mdx lives at the docs/ root, so a document-relative link in it
+// ("drivers/...", "img/...", "./drivers/...", "contribute/...") resolves
+// against that root. A site-root-relative link ("/docs/drivers/...",
+// "/img/...") already names its full path from the domain root, so only the
+// domain goes in front of it — prepending "/docs/" too would double it into
+// ".../docs/docs/...". Absolute http(s) links and same-page #anchors are
+// left untouched. Rewriting every other shape (rather than only the
+// "drivers/" links this table happens to use today) means a new link shape
+// upstream still resolves correctly here instead of silently 404ing on the
+// org landing page.
 export function absolutizeDocLinks(markdown) {
-  return markdown.replace(/\]\((?!https?:|#)([^)]+)\)/g, (_, href) => `](${DOCS_SITE_URL}/docs/${href.replace(/^\.?\//, '')})`);
+  return markdown.replace(/\]\((?!https?:|#)([^)]+)\)/g, (_, href) => (
+    href.startsWith('/') ? `](${DOCS_SITE_URL}${href})` : `](${DOCS_SITE_URL}/docs/${href.replace(/^\.\//, '')})`
+  ));
 }
 
 // generate-tools-table.js (in robotiq.github.io) always writes every one of
