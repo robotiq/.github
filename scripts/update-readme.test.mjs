@@ -1,5 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   escapeCell,
   buildRepoTable,
@@ -8,6 +12,8 @@ import {
   buildSoftwareToolsSection,
   replaceBetweenMarkers,
 } from './update-readme.mjs';
+
+const FIXTURES_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
 
 test('escapeCell escapes pipes and collapses newlines', () => {
   assert.equal(escapeCell('a | b'), 'a \\| b');
@@ -108,4 +114,75 @@ test('replaceBetweenMarkers only touches the named marker pair, leaving the rest
   const result = replaceBetweenMarkers(text, 'REPOS-TABLE', 'new repos');
   assert.match(result, /new repos/);
   assert.match(result, /old tools/);
+});
+
+// Mirrors main()'s actual sequence: read the README once, chain
+// replaceBetweenMarkers calls over the in-memory string, write once at the
+// end. If a later call throws (e.g. the README's own SOFTWARE-TOOLS marker
+// is damaged), fs.writeFileSync is never reached — proving that on disk,
+// not just in the return value of one function call.
+test('a failed second replacement leaves the README file on disk completely unchanged', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'update-readme-test-'));
+  const file = path.join(dir, 'README.md');
+  const original = [
+    '# Robotiq',
+    '',
+    '<!-- AUTO-GENERATED-REPOS-TABLE:START -->old repos<!-- AUTO-GENERATED-REPOS-TABLE:END -->',
+    '',
+    'no software tools markers here',
+  ].join('\n');
+  writeFileSync(file, original, 'utf8');
+
+  try {
+    assert.throws(() => {
+      let text = readFileSync(file, 'utf8');
+      text = replaceBetweenMarkers(text, 'REPOS-TABLE', 'new repos');
+      text = replaceBetweenMarkers(text, 'SOFTWARE-TOOLS', 'new tools'); // throws — SOFTWARE-TOOLS marker absent
+      writeFileSync(file, text, 'utf8'); // never reached
+    }, /Markers not found/);
+
+    assert.equal(readFileSync(file, 'utf8'), original);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// A real docs/intro.mdx snapshot (scripts/fixtures/intro.mdx), not the
+// minimal synthetic markers used above — exercises the actual regexes
+// against real badge markup, multi-column tables and legend bullets, so a
+// change to extractMarkerBlock/absolutizeDocLinks that breaks on real
+// formatting (but not on the synthetic fixture) shows up here.
+test('buildSoftwareToolsSection matches a real intro.mdx fixture (catches upstream format drift)', () => {
+  const fixture = readFileSync(path.join(FIXTURES_DIR, 'intro.mdx'), 'utf8');
+  const section = buildSoftwareToolsSection(fixture);
+
+  const headings = [...section.matchAll(/^#### (.+)$/gm)].map((m) => m[1]);
+  assert.deepEqual(headings, ['SDKs/languages', 'ROS2', 'ROS1', 'Physics engine', 'Other community projects']);
+
+  // Links absolutized against the docs site, not left root-relative.
+  assert.match(section, /\[2F \/ Hand-E\]\(https:\/\/robotiq\.github\.io\/docs\/drivers\/2F%20hande\)/);
+  assert.match(section, /\]\(https:\/\/robotiq\.github\.io\/docs\/drivers\/2F%20hande\/SDK\/C\+\+\)/);
+  // Legend text (not just table rows) survives.
+  assert.match(section, /ROS 2 LTS release \(2022\), supported until 2027\./);
+  // Nothing upstream-relative leaks into the README unresolved.
+  assert.doesNotMatch(section, /\]\(drivers\//);
+});
+
+test('regenerating from the same inputs is idempotent — byte-identical output both times', () => {
+  const repos = [
+    { name: 'grippers', url: 'https://github.com/robotiq/grippers', description: 'A driver' },
+    { name: 'ros', url: 'https://github.com/robotiq/ros', description: 'ROS packages' },
+  ];
+  assert.equal(buildRepoTable(repos), buildRepoTable(repos));
+
+  const fixture = readFileSync(path.join(FIXTURES_DIR, 'intro.mdx'), 'utf8');
+  assert.equal(buildSoftwareToolsSection(fixture), buildSoftwareToolsSection(fixture));
+
+  // Applying the same replacement twice in sequence (as a second run of the
+  // script would, against its own previous output) reaches a fixed point.
+  const text = '<!-- AUTO-GENERATED-REPOS-TABLE:START -->x<!-- AUTO-GENERATED-REPOS-TABLE:END -->';
+  const content = buildRepoTable(repos);
+  const once = replaceBetweenMarkers(text, 'REPOS-TABLE', content);
+  const twice = replaceBetweenMarkers(once, 'REPOS-TABLE', content);
+  assert.equal(once, twice);
 });
