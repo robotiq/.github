@@ -8,21 +8,21 @@ name: Update README
 #
 # How this merges without a second identity: `prToMain` has a bypass actor
 # for the "GitHub Actions" app (mode: pull request), exempting
-# github-actions[bot] — the identity GITHUB_TOKEN always acts as — from the
-# 1-review requirement. A bot still can't literally approve its own PR (a
-# GitHub-wide rule bypass doesn't touch), so this workflow doesn't try to;
-# it just merges directly, since the rule requiring an approval doesn't
-# apply to this actor in the first place.
+# github-actions[bot] — the identity GITHUB_TOKEN always acts as — from
+# every rule in that ruleset, including the 1-review requirement and the
+# `test` required check. A bot still can't literally approve its own PR (a
+# GitHub-wide rule a bypass doesn't touch), so this workflow doesn't try
+# to; it merges directly, since the rules that would block it don't apply
+# to this actor.
 #
-# What still gates the merge: a *separate* ruleset, `requireTests`, targets
-# the same branch with only the "test" required status check and NO bypass
-# actors — it applies to every actor, bypass or not. Bypassing prToMain's
-# review rule doesn't touch it, because ruleset bypass is scoped to the
-# whole ruleset it's granted on, not to individual rules within it (that's
-# exactly why the check was moved into its own ruleset instead of living
-# alongside the bypassed review rule in prToMain — see the discussion on
-# PR #2). So a change that breaks update-readme.mjs still sits as an open,
-# failing PR instead of reaching the org's public landing page.
+# Why the `test` check can't be what gates this PR: GitHub does not trigger
+# workflow runs from events created by GITHUB_TOKEN, so test.yml
+# (on: pull_request) never starts for a PR this workflow opens — its check
+# would sit "expected — waiting for status" forever and the merge would
+# never happen. The test runs as a step in this job instead, before the PR
+# is opened, so a change that breaks update-readme.mjs fails the run here
+# and never reaches profile/README.md. test.yml still gates PRs opened by
+# humans, where it does run.
 
 on:
   schedule:
@@ -43,6 +43,11 @@ jobs:
         with:
           node-version: 20
 
+      - name: Test update-readme.mjs
+        # This job's own gate — test.yml can't serve as one for the PR this
+        # job opens; see the note at the top of this file.
+        run: node --test scripts/*.test.mjs
+
       - name: Regenerate README
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,9 +62,9 @@ jobs:
           fi
 
           # Fixed name rather than one timestamped per run: a run that lands
-          # before yesterday's PR merged (still waiting on the required
-          # check) force-pushes onto the same branch/PR instead of piling
-          # up a new branch and a new unmergeable PR each day.
+          # before yesterday's PR merged force-pushes onto the same
+          # branch/PR instead of piling up a new branch and a new PR each
+          # day.
           BRANCH="auto/update-readme"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -68,7 +73,9 @@ jobs:
           git commit -m "chore: update README repository table and software tools section"
           git push --force origin "$BRANCH"
 
-          EXISTING_PR=$(gh pr list --base main --head "$BRANCH" --state open --json url --jq '.[0].url')
+          # `// empty` because --jq '.[0].url' prints the literal string
+          # "null" on an empty list, which [ -n ] would treat as a hit.
+          EXISTING_PR=$(gh pr list --base main --head "$BRANCH" --state open --json url --jq '.[0].url // empty')
           if [ -n "$EXISTING_PR" ]; then
             PR_URL="$EXISTING_PR"
           else
@@ -79,4 +86,7 @@ jobs:
               --body "Automated daily refresh of the repository table (GitHub API) and software tools section (robotiq.github.io docs/intro.mdx) — see \`scripts/update-readme.mjs\`.")
           fi
 
-          gh pr merge --auto --squash --delete-branch "$PR_URL"
+          # Not --auto: with the prToMain bypass there's nothing left to
+          # wait on, and a direct merge fails loudly in this run instead of
+          # quietly queueing a PR that never lands.
+          gh pr merge --squash --delete-branch "$PR_URL"

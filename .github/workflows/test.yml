@@ -1,10 +1,12 @@
 name: Test
 
-# Runs scripts/update-readme.test.mjs on every PR into main. Intended to be
-# added as a required status check on the prToMain ruleset, so a PR that
-# breaks scripts/update-readme.mjs (including one opened by
-# update-readme.yml's own daily run) can't merge — see the "required check"
-# discussion on PR #2.
+# Runs scripts/update-readme.test.mjs on every PR into main, as the `test`
+# required status check on the prToMain ruleset.
+#
+# This gates PRs opened by humans. It cannot gate the daily PR opened by
+# update-readme.yml: GitHub doesn't trigger workflow runs from events
+# created by GITHUB_TOKEN, so this workflow never starts for that PR. That
+# run executes these same tests as a step in its own job instead.
 
 on:
   pull_request:
