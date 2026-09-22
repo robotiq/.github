@@ -2,7 +2,7 @@
 //  - "Repositories": one row per public, non-archived, non-fork repo in the
 //    robotiq GitHub org (excluding this repo and the docs site itself),
 //    pulled live from the GitHub API.
-//  - "Software tools": the SDK / ROS2 / ROS1 / Physics engine / Other tables
+//  - "Software tools": the Libraries / ROS2 / ROS1 / Simulation / Other tables
 //    imported from robotiq/robotiq.github.io's docs/intro.mdx (itself kept
 //    up to date by that repo's own scripts/generate-tools-table.js), with
 //    relative doc links rewritten to absolute robotiq.github.io URLs.
@@ -29,10 +29,10 @@ const DOCS_SITE_URL = 'https://robotiq.github.io';
 const EXCLUDED_REPOS = new Set(['.github', DOCS_REPO]);
 
 const SOFTWARE_SECTIONS = [
-  { key: 'SDK', heading: 'SDKs/languages' },
+  { key: 'LIBRARIES', heading: 'Libraries' },
   { key: 'ROS2', heading: 'ROS2' },
   { key: 'ROS1', heading: 'ROS1' },
-  { key: 'PHYSICS_ENGINE', heading: 'Physics engine' },
+  { key: 'SIMULATION', heading: 'Simulation' },
   { key: 'OTHER', heading: 'Other community projects' },
 ];
 

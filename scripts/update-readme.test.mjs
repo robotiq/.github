@@ -39,15 +39,15 @@ test('buildRepoTable escapes a pipe in a live repo description', () => {
 
 test('extractMarkerBlock returns the trimmed content between markers', () => {
   const raw = [
-    '{/* AUTO-GENERATED-SDK-TABLE:START */}',
+    '{/* AUTO-GENERATED-LIBRARIES-TABLE:START */}',
     '| a | b |',
-    '{/* AUTO-GENERATED-SDK-TABLE:END */}',
+    '{/* AUTO-GENERATED-LIBRARIES-TABLE:END */}',
   ].join('\n');
-  assert.equal(extractMarkerBlock(raw, 'SDK'), '| a | b |');
+  assert.equal(extractMarkerBlock(raw, 'LIBRARIES'), '| a | b |');
 });
 
 test('extractMarkerBlock returns null when the marker pair is absent', () => {
-  assert.equal(extractMarkerBlock('no markers here', 'SDK'), null);
+  assert.equal(extractMarkerBlock('no markers here', 'LIBRARIES'), null);
 });
 
 test('absolutizeDocLinks rewrites relative links, leaves absolute/anchor links alone', () => {
@@ -68,7 +68,7 @@ test('absolutizeDocLinks prepends only the domain to a site-root-relative link, 
 });
 
 function fakeIntro(overrides = {}) {
-  const sections = { SDK: '| sdk |', ROS2: '| ros2 |', ROS1: '| ros1 |', PHYSICS_ENGINE: '| phys |', OTHER: '| other |', ...overrides };
+  const sections = { LIBRARIES: '| sdk |', ROS2: '| ros2 |', ROS1: '| ros1 |', SIMULATION: '| phys |', OTHER: '| other |', ...overrides };
   return Object.entries(sections)
     .filter(([, body]) => body !== null)
     .map(([key, body]) => `{/* AUTO-GENERATED-${key}-TABLE:START */}\n${body}\n{/* AUTO-GENERATED-${key}-TABLE:END */}`)
@@ -78,11 +78,11 @@ function fakeIntro(overrides = {}) {
 test('buildSoftwareToolsSection includes every section heading, in order, when all markers are present', () => {
   const section = buildSoftwareToolsSection(fakeIntro());
   const headings = [...section.matchAll(/^#### (.+)$/gm)].map((m) => m[1]);
-  assert.deepEqual(headings, ['SDKs/languages', 'ROS2', 'ROS1', 'Physics engine', 'Other community projects']);
+  assert.deepEqual(headings, ['Libraries', 'ROS2', 'ROS1', 'Simulation', 'Other community projects']);
 });
 
 test('buildSoftwareToolsSection throws instead of publishing a partial section when a marker is missing', () => {
-  assert.throws(() => buildSoftwareToolsSection(fakeIntro({ PHYSICS_ENGINE: null })), /Physics engine/);
+  assert.throws(() => buildSoftwareToolsSection(fakeIntro({ SIMULATION: null })), /Simulation/);
 });
 
 test('replaceBetweenMarkers replaces content between an existing marker pair', () => {
@@ -157,7 +157,7 @@ test('buildSoftwareToolsSection matches a real intro.mdx fixture (catches upstre
   const section = buildSoftwareToolsSection(fixture);
 
   const headings = [...section.matchAll(/^#### (.+)$/gm)].map((m) => m[1]);
-  assert.deepEqual(headings, ['SDKs/languages', 'ROS2', 'ROS1', 'Physics engine', 'Other community projects']);
+  assert.deepEqual(headings, ['Libraries', 'ROS2', 'ROS1', 'Simulation', 'Other community projects']);
 
   // Links absolutized against the docs site, not left root-relative.
   assert.match(section, /\[2F \/ Hand-E\]\(https:\/\/robotiq\.github\.io\/docs\/drivers\/2F%20hande\)/);
