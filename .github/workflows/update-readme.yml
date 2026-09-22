@@ -4,58 +4,70 @@ name: Update README
 # scripts/update-readme.mjs): the repository table (from the GitHub API) and
 # the software tools tables (imported from robotiq/robotiq.github.io's
 # docs/intro.mdx). Opens a PR only when the regenerated content actually
-# differs, then merges it — fully automatic, no human review, no bot PAT.
+# differs; readme-auto-merge.yml then approves and merges it. Fully
+# automatic, no human review, no PAT, no bot account, and no ruleset bypass
+# — every prToMain rule stays enforced against every actor.
 #
-# How this merges without a second identity: `prToMain` has a bypass actor
-# for the "GitHub Actions" app (mode: pull request), exempting
-# github-actions[bot] — the identity GITHUB_TOKEN always acts as — from
-# every rule in that ruleset, including the 1-review requirement and the
-# `test` required check. A bot still can't literally approve its own PR (a
-# GitHub-wide rule a bypass doesn't touch), so this workflow doesn't try
-# to; it merges directly, since the rules that would block it don't apply
-# to this actor.
+# Why the PR is opened with a GitHub App token and not GITHUB_TOKEN:
 #
-# Why the `test` check can't be what gates this PR: GitHub does not trigger
-# workflow runs from events created by GITHUB_TOKEN, so test.yml
-# (on: pull_request) never starts for a PR this workflow opens — its check
-# would sit "expected — waiting for status" forever and the merge would
-# never happen. The test runs as a step in this job instead, before the PR
-# is opened, so a change that breaks update-readme.mjs fails the run here
-# and never reaches profile/README.md. test.yml still gates PRs opened by
-# humans, where it does run.
+#  1. GitHub does not trigger workflow runs from events created by
+#     GITHUB_TOKEN. A PR opened with it would never start test.yml, so the
+#     required `test` check would sit "expected — waiting for status"
+#     forever and the PR would never become mergeable.
+#  2. prToMain requires one approving review, and GitHub blocks a PR's own
+#     author from approving it. The approval in readme-auto-merge.yml comes
+#     from GITHUB_TOKEN (github-actions[bot]); that only works if some
+#     *other* actor opened the PR.
+#
+# The `robotiq-readme-bot` App satisfies both: it's a distinct actor from
+# github-actions[bot], and it isn't tied to anyone's personal account, so
+# there's no rotation/offboarding problem. This is the same two-actor shape
+# as robotiq.github.io's dependabot-auto-merge.yml, with the App standing in
+# for Dependabot.
 
 on:
   schedule:
     - cron: '17 6 * * *'
   workflow_dispatch: {}
 
+# The App token does all the writing; this job's own GITHUB_TOKEN only needs
+# to read the checkout.
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+
+concurrency:
+  group: update-readme
+  cancel-in-progress: false
 
 jobs:
   update-readme:
     runs-on: ubuntu-latest
     steps:
+      - name: Mint App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
+        with:
+          # Persist the App token as the credential git push will use, so
+          # the push (and the PR it produces) is attributed to the App.
+          token: ${{ steps.app-token.outputs.token }}
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Test update-readme.mjs
-        # This job's own gate — test.yml can't serve as one for the PR this
-        # job opens; see the note at the top of this file.
-        run: node --test scripts/*.test.mjs
-
       - name: Regenerate README
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
         run: node scripts/update-readme.mjs
 
-      - name: Open and merge PR if content changed
+      - name: Open PR if content changed
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           if git diff --quiet -- profile/README.md; then
             exit 0
@@ -66,8 +78,13 @@ jobs:
           # branch/PR instead of piling up a new branch and a new PR each
           # day.
           BRANCH="auto/update-readme"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # The App's bot identity, so the commit is attributed to a real
+          # GitHub account — prToMain sets
+          # require_extra_approval_for_unattributed_changes, which would
+          # demand a second approval for commits it can't attribute.
+          git config user.name "robotiq-readme-bot[bot]"
+          git config user.email "332551394+robotiq-readme-bot[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
           git add profile/README.md
           git commit -m "chore: update README repository table and software tools section"
@@ -77,16 +94,13 @@ jobs:
           # "null" on an empty list, which [ -n ] would treat as a hit.
           EXISTING_PR=$(gh pr list --base main --head "$BRANCH" --state open --json url --jq '.[0].url // empty')
           if [ -n "$EXISTING_PR" ]; then
-            PR_URL="$EXISTING_PR"
+            # Already open: the force-push above fires a `synchronize` event,
+            # which re-runs readme-auto-merge.yml against it.
+            echo "Updated existing PR: $EXISTING_PR"
           else
-            PR_URL=$(gh pr create \
+            gh pr create \
               --base main \
               --head "$BRANCH" \
               --title "chore: update README repository table" \
-              --body "Automated daily refresh of the repository table (GitHub API) and software tools section (robotiq.github.io docs/intro.mdx) — see \`scripts/update-readme.mjs\`.")
+              --body "Automated daily refresh of the repository table (GitHub API) and software tools section (robotiq.github.io docs/intro.mdx) — see \`scripts/update-readme.mjs\`."
           fi
-
-          # Not --auto: with the prToMain bypass there's nothing left to
-          # wait on, and a direct merge fails loudly in this run instead of
-          # quietly queueing a PR that never lands.
-          gh pr merge --squash --delete-branch "$PR_URL"

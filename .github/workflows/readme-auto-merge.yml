@@ -1,0 +1,57 @@
+name: README auto-merge
+
+# Approves and merges the daily PR opened by update-readme.yml's App token.
+# Closely modelled on robotiq.github.io's dependabot-auto-merge.yml.
+#
+# Why this isn't self-approval: prToMain's required-review rule blocks a
+# PR's *author* from approving it, not a different actor. The App
+# (robotiq-readme-bot[bot]) opens the PR; this workflow's own GITHUB_TOKEN
+# (github-actions[bot]) submits the approval. Two distinct actors, so
+# GitHub accepts it — the same arrangement that merges Dependabot's PRs on
+# robotiq.github.io today.
+#
+# Why this is safe to merge without further human review: prToMain also
+# requires the `test` status check (test.yml) to pass, and `gh pr merge
+# --auto` queues the merge without completing it until that check reports
+# success. A change that breaks scripts/update-readme.mjs therefore sits as
+# an open, failing PR instead of reaching the org's public landing page.
+# Nothing here bypasses a rule; it satisfies them.
+#
+# Why plain `pull_request` and not `pull_request_target`: the dependabot
+# equivalent needs pull_request_target only because GitHub hands a
+# read-only, secret-less token to `pull_request` runs on Dependabot PRs.
+# That restriction doesn't apply here — this PR comes from a branch in this
+# repo — so the safer trigger works. Note this job deliberately has NO
+# checkout step; don't add one, since approving and merging code that the
+# job has also checked out with a write-capable token is the footgun both
+# triggers are guarding against.
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    # Both conditions matter: the actor check stops this from approving
+    # anyone else's PR, and the branch check keeps it to the generated one
+    # even if the App is ever used for something else.
+    if: >-
+      github.actor == 'robotiq-readme-bot[bot]' &&
+      github.event.pull_request.head.ref == 'auto/update-readme'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Approve
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr review --approve "$PR_URL"
+
+      - name: Enable auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge --auto --squash --delete-branch "$PR_URL"
