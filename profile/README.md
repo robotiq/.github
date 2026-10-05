@@ -43,30 +43,14 @@ Open-source software tools for Robotiq developers.
 - **C++** — Compiled, performance-oriented object-oriented language.
 - **Python** — Interpreted, prototyping-oriented language.
 
-#### ROS2
+#### ROS
 
-| Product | Lyrical | Jazzy | Humble |
-|---|---|---|---|
-| [Adaptive grippers](https://robotiq.github.io/docs/drivers/Adaptive%20grippers) | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://robotiq.github.io/docs/drivers/Adaptive%20grippers/ROS/ROS2-Lyrical) | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://robotiq.github.io/docs/drivers/Adaptive%20grippers/ROS/ROS2-Jazzy) | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://robotiq.github.io/docs/drivers/Adaptive%20grippers/ROS/ROS2-Humble) |
-| [EPick](https://robotiq.github.io/docs/drivers/EPick) | - | - | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://robotiq.github.io/docs/drivers/EPick/ROS/ROS2-Humble) |
-| [Force Torque Sensor](https://robotiq.github.io/docs/drivers/Force%20Torque%20Sensor) | - | - | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://robotiq.github.io/docs/drivers/Force%20Torque%20Sensor/ROS/ROS2-Humble) |
-| [Tactile Sensor](https://robotiq.github.io/docs/drivers/Tactile%20Sensor) | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://robotiq.github.io/docs/drivers/Tactile%20Sensor/ROS/ROS2-Lyrical) | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://robotiq.github.io/docs/drivers/Tactile%20Sensor/ROS/ROS2-Jazzy) | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://robotiq.github.io/docs/drivers/Tactile%20Sensor/ROS/ROS2-Humble) |
-
-- **Lyrical** — ROS 2 LTS release (2026).
-- **Jazzy** — ROS 2 LTS release (2024), supported until 2029.
-- **Humble** — ROS 2 LTS release (2022), supported until 2027.
-
-#### ROS1
-
-| Product | Noetic | Melodic | Kinetic | Indigo |
-|---|---|---|---|---|
-| [Adaptive grippers](https://robotiq.github.io/docs/drivers/Adaptive%20grippers) | - | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://robotiq.github.io/docs/drivers/Adaptive%20grippers/ROS/ROS1-Melodic) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://robotiq.github.io/docs/drivers/Adaptive%20grippers/ROS/ROS1-Kinetic) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://robotiq.github.io/docs/drivers/Adaptive%20grippers/ROS/ROS1-Indigo) |
-| [Tactile Sensor](https://robotiq.github.io/docs/drivers/Tactile%20Sensor) | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://robotiq.github.io/docs/drivers/Tactile%20Sensor/ROS/ROS1-Noetic) | - | - | - |
-
-- **Noetic** — Final ROS 1 release (2020), end of life May 2025.
-- **Melodic** — ROS 1 release (2018), end of life.
-- **Kinetic** — ROS 1 release (2016), end of life.
-- **Indigo** — ROS 1 release (2014), end of life.
+| Product | ROS |
+|---|---|
+| [Adaptive grippers](https://robotiq.github.io/docs/drivers/Adaptive%20grippers) | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://robotiq.github.io/docs/drivers/Adaptive%20grippers/ROS) |
+| [EPick](https://robotiq.github.io/docs/drivers/EPick) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://robotiq.github.io/docs/drivers/EPick/ROS) |
+| [Force Torque Sensor](https://robotiq.github.io/docs/drivers/Force%20Torque%20Sensor) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://robotiq.github.io/docs/drivers/Force%20Torque%20Sensor/ROS) |
+| [Tactile Sensor](https://robotiq.github.io/docs/drivers/Tactile%20Sensor) | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://robotiq.github.io/docs/drivers/Tactile%20Sensor/ROS) |
 
 #### Simulation
 
