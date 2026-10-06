@@ -50,6 +50,34 @@ test('extractMarkerBlock returns null when the marker pair is absent', () => {
   assert.equal(extractMarkerBlock('no markers here', 'LIBRARIES'), null);
 });
 
+test('extractMarkerBlock strips a leading heading line inside the marker pair', () => {
+  // The docs site has put the section's own "### Heading" both outside and
+  // inside the marker pair across different restructures — strip it either
+  // way, since buildSoftwareToolsSection supplies its own heading and a
+  // leaked one would duplicate it in the README.
+  const raw = [
+    '{/* AUTO-GENERATED-LIBRARIES-TABLE:START */}',
+    '### Libraries',
+    '',
+    '| a | b |',
+    '{/* AUTO-GENERATED-LIBRARIES-TABLE:END */}',
+  ].join('\n');
+  assert.equal(extractMarkerBlock(raw, 'LIBRARIES'), '| a | b |');
+});
+
+test('extractMarkerBlock strips a heading even when it is the only thing in the block', () => {
+  // The trailing \n+ in the strip regex only matched when something
+  // followed the heading — a block that's nothing but a heading has no
+  // trailing newline left (the outer regex already consumed the one before
+  // END), so it came through unchanged, leaking a duplicate heading.
+  const raw = [
+    '{/* AUTO-GENERATED-LIBRARIES-TABLE:START */}',
+    '### Libraries',
+    '{/* AUTO-GENERATED-LIBRARIES-TABLE:END */}',
+  ].join('\n');
+  assert.equal(extractMarkerBlock(raw, 'LIBRARIES'), '');
+});
+
 test('absolutizeDocLinks rewrites relative links, leaves absolute/anchor links alone', () => {
   const input = '[a](drivers/Foo) [b](img/x.png) [c](./drivers/Foo) [d](https://example.com) [e](#section)';
   const output = absolutizeDocLinks(input);
@@ -68,7 +96,7 @@ test('absolutizeDocLinks prepends only the domain to a site-root-relative link, 
 });
 
 function fakeIntro(overrides = {}) {
-  const sections = { LIBRARIES: '| sdk |', ROS2: '| ros2 |', ROS1: '| ros1 |', SIMULATION: '| phys |', OTHER: '| other |', ...overrides };
+  const sections = { LIBRARIES: '| sdk |', ROS: '| ros |', SIMULATION: '| phys |', OTHER: '| other |', ...overrides };
   return Object.entries(sections)
     .filter(([, body]) => body !== null)
     .map(([key, body]) => `{/* AUTO-GENERATED-${key}-TABLE:START */}\n${body}\n{/* AUTO-GENERATED-${key}-TABLE:END */}`)
@@ -78,7 +106,7 @@ function fakeIntro(overrides = {}) {
 test('buildSoftwareToolsSection includes every section heading, in order, when all markers are present', () => {
   const section = buildSoftwareToolsSection(fakeIntro());
   const headings = [...section.matchAll(/^#### (.+)$/gm)].map((m) => m[1]);
-  assert.deepEqual(headings, ['Libraries', 'ROS2', 'ROS1', 'Simulation', 'Other community projects']);
+  assert.deepEqual(headings, ['Libraries', 'ROS', 'Simulation', 'Other community projects']);
 });
 
 test('buildSoftwareToolsSection throws instead of publishing a partial section when a marker is missing', () => {
@@ -157,13 +185,18 @@ test('buildSoftwareToolsSection matches a real intro.mdx fixture (catches upstre
   const section = buildSoftwareToolsSection(fixture);
 
   const headings = [...section.matchAll(/^#### (.+)$/gm)].map((m) => m[1]);
-  assert.deepEqual(headings, ['Libraries', 'ROS2', 'ROS1', 'Simulation', 'Other community projects']);
+  assert.deepEqual(headings, ['Libraries', 'ROS', 'Simulation', 'Other community projects']);
+  // The heading check above only matches our own `####` lines — it would
+  // still pass even if extractMarkerBlock regressed and let the fixture's
+  // own `### Heading` lines leak through alongside ours. Assert directly
+  // that none did.
+  assert.doesNotMatch(section, /^#{1,3} /m);
 
   // Links absolutized against the docs site, not left root-relative.
-  assert.match(section, /\[2F \/ Hand-E\]\(https:\/\/robotiq\.github\.io\/docs\/drivers\/2F%20hande\)/);
-  assert.match(section, /\]\(https:\/\/robotiq\.github\.io\/docs\/drivers\/2F%20hande\/SDK\/C\+\+\)/);
+  assert.match(section, /\[Adaptive grippers\]\(https:\/\/robotiq\.github\.io\/docs\/drivers\/Adaptive%20grippers\)/);
+  assert.match(section, /\]\(https:\/\/robotiq\.github\.io\/docs\/drivers\/Adaptive%20grippers\/Libraries\/C\+\+\)/);
   // Legend text (not just table rows) survives.
-  assert.match(section, /ROS 2 LTS release \(2022\), supported until 2027\./);
+  assert.match(section, /Compiled, performance-oriented language\./);
   // Nothing upstream-relative leaks into the README unresolved.
   assert.doesNotMatch(section, /\]\(drivers\//);
 });

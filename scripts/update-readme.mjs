@@ -2,7 +2,7 @@
 //  - "Repositories": one row per public, non-archived, non-fork repo in the
 //    robotiq GitHub org (excluding this repo and the docs site itself),
 //    pulled live from the GitHub API.
-//  - "Software tools": the Libraries / ROS2 / ROS1 / Simulation / Other tables
+//  - "Software tools": the Libraries / ROS / Simulation / Other tables
 //    imported from robotiq/robotiq.github.io's docs/intro.mdx (itself kept
 //    up to date by that repo's own scripts/generate-tools-table.js), with
 //    relative doc links rewritten to absolute robotiq.github.io URLs.
@@ -30,8 +30,7 @@ const EXCLUDED_REPOS = new Set(['.github', DOCS_REPO]);
 
 const SOFTWARE_SECTIONS = [
   { key: 'LIBRARIES', heading: 'Libraries' },
-  { key: 'ROS2', heading: 'ROS2' },
-  { key: 'ROS1', heading: 'ROS1' },
+  { key: 'ROS', heading: 'ROS' },
   { key: 'SIMULATION', heading: 'Simulation' },
   { key: 'OTHER', heading: 'Other community projects' },
 ];
@@ -90,7 +89,13 @@ export function extractMarkerBlock(raw, key) {
     `\\{/\\* AUTO-GENERATED-${key}-TABLE:START \\*/\\}\\n([\\s\\S]*?)\\n\\{/\\* AUTO-GENERATED-${key}-TABLE:END \\*/\\}`
   );
   const m = raw.match(re);
-  return m ? m[1].trim() : null;
+  if (!m) return null;
+  // Whether the section's own `### Heading` sits inside or outside the
+  // marker pair has changed upstream before (outside as of the original
+  // format, inside as of the Libraries/ROS/Simulation restructure) — strip
+  // a leading heading line either way, since buildSoftwareToolsSection
+  // always supplies its own heading and a leaked one would duplicate it.
+  return m[1].trim().replace(/^#{1,6}[^\n]*(\n+|$)/, '').trim();
 }
 
 // docs/intro.mdx lives at the docs/ root, so a document-relative link in it
