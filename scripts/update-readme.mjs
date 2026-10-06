@@ -95,7 +95,7 @@ export function extractMarkerBlock(raw, key) {
   // format, inside as of the Libraries/ROS/Simulation restructure) — strip
   // a leading heading line either way, since buildSoftwareToolsSection
   // always supplies its own heading and a leaked one would duplicate it.
-  return m[1].trim().replace(/^#{1,6}[^\n]*\n+/, '').trim();
+  return m[1].trim().replace(/^#{1,6}[^\n]*(\n+|$)/, '').trim();
 }
 
 // docs/intro.mdx lives at the docs/ root, so a document-relative link in it

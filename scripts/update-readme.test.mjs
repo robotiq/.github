@@ -65,6 +65,19 @@ test('extractMarkerBlock strips a leading heading line inside the marker pair', 
   assert.equal(extractMarkerBlock(raw, 'LIBRARIES'), '| a | b |');
 });
 
+test('extractMarkerBlock strips a heading even when it is the only thing in the block', () => {
+  // The trailing \n+ in the strip regex only matched when something
+  // followed the heading — a block that's nothing but a heading has no
+  // trailing newline left (the outer regex already consumed the one before
+  // END), so it came through unchanged, leaking a duplicate heading.
+  const raw = [
+    '{/* AUTO-GENERATED-LIBRARIES-TABLE:START */}',
+    '### Libraries',
+    '{/* AUTO-GENERATED-LIBRARIES-TABLE:END */}',
+  ].join('\n');
+  assert.equal(extractMarkerBlock(raw, 'LIBRARIES'), '');
+});
+
 test('absolutizeDocLinks rewrites relative links, leaves absolute/anchor links alone', () => {
   const input = '[a](drivers/Foo) [b](img/x.png) [c](./drivers/Foo) [d](https://example.com) [e](#section)';
   const output = absolutizeDocLinks(input);
@@ -173,6 +186,11 @@ test('buildSoftwareToolsSection matches a real intro.mdx fixture (catches upstre
 
   const headings = [...section.matchAll(/^#### (.+)$/gm)].map((m) => m[1]);
   assert.deepEqual(headings, ['Libraries', 'ROS', 'Simulation', 'Other community projects']);
+  // The heading check above only matches our own `####` lines — it would
+  // still pass even if extractMarkerBlock regressed and let the fixture's
+  // own `### Heading` lines leak through alongside ours. Assert directly
+  // that none did.
+  assert.doesNotMatch(section, /^#{1,3} /m);
 
   // Links absolutized against the docs site, not left root-relative.
   assert.match(section, /\[Adaptive grippers\]\(https:\/\/robotiq\.github\.io\/docs\/drivers\/Adaptive%20grippers\)/);
