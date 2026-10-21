@@ -22,7 +22,7 @@ Open-source software tools for Robotiq developers.
 |---|---|
 | [grippers](https://github.com/robotiq/grippers) | Robotiq Adaptive Gripper SDK (C++ controller, ...) |
 | [isaacsim_assets](https://github.com/robotiq/isaacsim_assets) | Isaac Sim assets for Robotiq hardware |
-| [ros](https://github.com/robotiq/ros) | ROS packages for Robotiq hardware |
+| [robotiq-ros](https://github.com/robotiq/robotiq-ros) | ROS packages for Robotiq hardware |
 | [tactile_sensors](https://github.com/robotiq/tactile_sensors) | Robotiq Tactile Sensor SDK (C++ controller, Python viewer,...) |
 <!-- AUTO-GENERATED-REPOS-TABLE:END -->
 
