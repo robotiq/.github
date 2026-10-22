@@ -26,10 +26,10 @@ platform's own instructions to find your way to the software tool.
 
 | Product | ROS |
 |---|---|
-| Adaptive grippers | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/ros) |
+| Adaptive grippers | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros) |
 | EPick | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/PickNikRobotics/ros2_epick_gripper) |
 | Force Torque Sensor | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/panagelak/rq_fts_ros2_driver) |
-| Tactile Sensor | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/ros) |
+| Tactile Sensor | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros) |
 
 ### Simulation
 
