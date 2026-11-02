@@ -14,7 +14,11 @@ platform's own instructions to find your way to the software tool.
 
 | Product | C | C++ | Python |
 |---|---|---|---|
-| Adaptive grippers | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
+| 2F-85 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
+| 2F-140 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
+| Hand-E | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
+| Hand-E 100 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
+| Hand-E C10 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
 | Force Torque Sensor | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://robotiq.com/support) | - | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyFT300) |
 | Tactile Sensor | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/tactile_sensors) | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/tactile_sensors) |
 
@@ -26,27 +30,45 @@ platform's own instructions to find your way to the software tool.
 
 | Product | ROS |
 |---|---|
-| Adaptive grippers | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/ros) |
+| 2F-85 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/grippers) |
+| 2F-140 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/grippers) |
+| Hand-E | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/grippers) |
+| Hand-E 100 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/grippers) |
+| Hand-E C10 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/grippers) |
 | EPick | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/PickNikRobotics/ros2_epick_gripper) |
 | Force Torque Sensor | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/panagelak/rq_fts_ros2_driver) |
-| Tactile Sensor | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/ros) |
+| Tactile Sensor | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/robotiq_tsf) |
 
 ### Simulation
 
-| Product | Isaac Sim | PyBullet | MuJoCo |
+| Product | Isaac Sim / Isaac Lab | PyBullet | MuJoCo |
 |---|---|---|---|
-| Adaptive grippers | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/isaacsim_assets) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/ElectronicElephant/pybullet_ur5_robotiq) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/google-deepmind/mujoco_menagerie/tree/main/robotiq_2f85) |
-| Tactile Sensor | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/Lab-CORO/TSF-85) | - | - |
+| 2F-85 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/isaacsim_assets/tree/main/grippers/Robotiq_2F_85) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/ElectronicElephant/pybullet_ur5_robotiq) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/google-deepmind/mujoco_menagerie/tree/main/robotiq_2f85) |
+| 2F-140 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/isaacsim_assets/tree/main/grippers/Robotiq_2F_140) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/ElectronicElephant/pybullet_ur5_robotiq) | - |
+| Hand-E | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/isaacsim_assets/tree/main/grippers/Robotiq_Hand_E) | - | - |
+| Hand-E 100 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/isaacsim_assets/tree/main/grippers/Robotiq_Hand_E) | - | - |
+| Hand-E C10 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/isaacsim_assets/tree/main/grippers/Robotiq_Hand_E_C10) | - | - |
+| Tactile Sensor | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/isaacsim_assets/tree/main/grippers/tactile) | - | - |
 
-- **Isaac Sim** — NVIDIA Isaac Sim integration for simulating the hardware.
+- **Isaac Sim / Isaac Lab** — NVIDIA Isaac Sim assets for simulating the hardware, also usable for robot learning in Isaac Lab.
 - **PyBullet** — PyBullet integration for physics-based simulation.
 - **MuJoCo** — MuJoCo (MJCF) model for physics-based simulation.
+
+### AI agents
+
+| Product | MCP |
+|---|---|
+| 2F-85 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/mcp) |
+| 2F-140 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/mcp) |
+| Tactile Sensor | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/mcp) |
+
+- **MCP** — Model Context Protocol server that lets LLM agents drive the hardware.
 
 ### Other community projects
 
 | Product | Project |
 |---|---|
-| Adaptive grippers | [GraspGen](https://github.com/NVlabs/GraspGen) — NVIDIA's diffusion-based framework for 6-DOF grasping, with Robotiq gripper definitions |
+| 2F-85, 2F-140 | [GraspGen](https://github.com/NVlabs/GraspGen) — NVIDIA's diffusion-based framework for 6-DOF grasping, with Robotiq gripper definitions |
 
 ## Repositories
 
