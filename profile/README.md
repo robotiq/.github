@@ -16,6 +16,7 @@ platform's own instructions to find your way to the software tool.
 |---|---|---|---|
 | 2F-85 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
 | 2F-140 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
+| 2F-240 | - | - | - |
 | Hand-E | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
 | Hand-E 100 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
 | Hand-E C10 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
@@ -31,10 +32,11 @@ platform's own instructions to find your way to the software tool.
 | Product | ROS |
 |---|---|
 | 2F-85 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/grippers) |
-| 2F-140 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/grippers) |
+| 2F-140 | - |
+| 2F-240 | - |
 | Hand-E | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/grippers) |
-| Hand-E 100 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/grippers) |
-| Hand-E C10 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/grippers) |
+| Hand-E 100 | - |
+| Hand-E C10 | - |
 | EPick | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/PickNikRobotics/ros2_epick_gripper) |
 | Force Torque Sensor | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/panagelak/rq_fts_ros2_driver) |
 | Tactile Sensor | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/robotiq_tsf) |
@@ -45,10 +47,11 @@ platform's own instructions to find your way to the software tool.
 |---|---|---|---|
 | 2F-85 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/isaacsim_assets/tree/main/grippers/Robotiq_2F_85) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/ElectronicElephant/pybullet_ur5_robotiq) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/google-deepmind/mujoco_menagerie/tree/main/robotiq_2f85) |
 | 2F-140 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/isaacsim_assets/tree/main/grippers/Robotiq_2F_140) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/ElectronicElephant/pybullet_ur5_robotiq) | - |
+| 2F-240 | - | - | - |
 | Hand-E | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/isaacsim_assets/tree/main/grippers/Robotiq_Hand_E) | - | - |
 | Hand-E 100 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/isaacsim_assets/tree/main/grippers/Robotiq_Hand_E) | - | - |
 | Hand-E C10 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/isaacsim_assets/tree/main/grippers/Robotiq_Hand_E_C10) | - | - |
-| Tactile Sensor | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/isaacsim_assets/tree/main/grippers/tactile) | - | - |
+| Tactile Sensor | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/isaacsim_assets/tree/main/grippers) | - | - |
 
 - **Isaac Sim / Isaac Lab** — NVIDIA Isaac Sim assets for simulating the hardware, also usable for robot learning in Isaac Lab.
 - **PyBullet** — PyBullet integration for physics-based simulation.
@@ -59,7 +62,7 @@ platform's own instructions to find your way to the software tool.
 | Product | MCP |
 |---|---|
 | 2F-85 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/mcp) |
-| 2F-140 | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/mcp) |
+| 2F-140 | - |
 | Tactile Sensor | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-ros/tree/main/mcp) |
 
 - **MCP** — Model Context Protocol server that lets LLM agents drive the hardware.
