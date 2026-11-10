@@ -14,14 +14,14 @@ platform's own instructions to find your way to the software tool.
 
 | Product | C | C++ | Python |
 |---|---|---|---|
-| 2F-85 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
-| 2F-140 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
+| 2F-85 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-sdk/tree/main/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
+| 2F-140 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-sdk/tree/main/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
 | 2F-240 | - | - | - |
-| Hand-E | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
-| Hand-E 100 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
-| Hand-E C10 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
+| Hand-E | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-sdk/tree/main/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
+| Hand-E 100 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-sdk/tree/main/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
+| Hand-E C10 | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-sdk/tree/main/grippers) | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyRobotiqGripper) |
 | Force Torque Sensor | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://robotiq.com/support) | - | [![Third party](https://img.shields.io/badge/Third_party-lightgrey)](https://github.com/castetsb/pyFT300) |
-| Tactile Sensor | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/tactile_sensors) | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/tactile_sensors) |
+| Tactile Sensor | - | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-sdk/tree/main/tsf) | [![Robotiq](https://img.shields.io/badge/Robotiq-blue)](https://github.com/robotiq/robotiq-sdk/tree/main/tsf) |
 
 - **C** — Compiled, performance-oriented language.
 - **C++** — Compiled, performance-oriented object-oriented language.
@@ -81,7 +81,6 @@ for a possible automated replacement.
 
 | Repository | Description |
 |---|---|
-| [grippers](https://github.com/robotiq/grippers) | Robotiq Adaptive Gripper SDK (C++ controller, ...) |
 | [isaacsim_assets](https://github.com/robotiq/isaacsim_assets) | Isaac Sim assets for Robotiq hardware |
 | [robotiq-ros](https://github.com/robotiq/robotiq-ros) | ROS packages for Robotiq hardware |
-| [tactile_sensors](https://github.com/robotiq/tactile_sensors) | Robotiq Tactile Sensor SDK (C++ controller, Python viewer,...) |
+| [robotiq-sdk](https://github.com/robotiq/robotiq-sdk) | Robotiq SDKs for the adaptive grippers (C++) and the Tactile Sensor (C++, Python viewer,...) |
